@@ -29,16 +29,16 @@ class PostViewer extends HookConsumerWidget {
   });
 
   final int initial;
-  final Iterable<Post> posts;
+  final List<Post> posts;
 
   static void open(
     BuildContext context, {
     required int index,
-    required Iterable<Post> posts,
+    required List<Post> posts,
   }) {
     context.navigator.push(
       SlidePageRoute(
-        opaque: false,
+        opaque: true,
         type: SlidePageType.close,
         builder: (_) {
           return UncontrolledProviderScope(
@@ -83,6 +83,7 @@ class PostViewer extends HookConsumerWidget {
       onPopInvokedWithResult: (didPop, _) async {
         ref.watch(fullscreenStateProvider.notifier).reset();
         context.scaffoldMessenger.removeCurrentSnackBar();
+        timelineController.scrollTo(currentPage.value);
       },
       child: Scaffold(
         backgroundColor: Colors.black,
@@ -98,7 +99,6 @@ class PostViewer extends HookConsumerWidget {
                       currentPage.value = index;
                     }
                   });
-                  timelineController.scrollTo(index);
                   context.scaffoldMessenger.hideCurrentSnackBar();
                   if (loadMore == null) return;
 

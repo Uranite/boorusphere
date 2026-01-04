@@ -135,7 +135,7 @@ class _Pager extends ConsumerWidget {
 class _Content extends ConsumerWidget {
   const _Content({required this.posts, required this.server});
 
-  final Iterable<Post> posts;
+  final List<Post> posts;
   final Server server;
 
   @override

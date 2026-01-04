@@ -21,7 +21,7 @@ import 'package:tinycolor2/tinycolor2.dart';
 class Timeline extends ConsumerWidget {
   const Timeline({super.key, required this.posts});
 
-  final Iterable<Post> posts;
+  final List<Post> posts;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

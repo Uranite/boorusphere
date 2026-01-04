@@ -30,7 +30,8 @@ class HomeContent extends HookConsumerWidget {
     ));
 
     final filteredPosts = pageState.data.posts
-        .where((it) => !it.allTags.any(blockedTags.contains));
+        .where((it) => !it.allTags.any(blockedTags.contains))
+        .toList();
 
     useEffect(() {
       if (servers.isNotEmpty) {

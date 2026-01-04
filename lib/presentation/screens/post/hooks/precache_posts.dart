@@ -1,7 +1,6 @@
 import 'package:boorusphere/data/repository/booru/entity/post.dart';
 import 'package:boorusphere/presentation/provider/booru/post_headers_factory.dart';
 import 'package:boorusphere/presentation/utils/extensions/post.dart';
-import 'package:collection/collection.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -9,7 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 void Function(int index, bool loadOriginal) usePrecachePosts(
   WidgetRef ref,
-  Iterable<Post> posts, {
+  List<Post> posts, {
   int range = 2,
 }) {
   return use(_PrecachePostsHook(ref, posts, range));
@@ -21,7 +20,7 @@ class _PrecachePostsHook extends Hook<_Precacher> {
   const _PrecachePostsHook(this.ref, this.posts, this.range);
 
   final WidgetRef ref;
-  final Iterable<Post> posts;
+  final List<Post> posts;
   final int range;
 
   @override
@@ -49,16 +48,13 @@ class _PrecachePostsState extends HookState<_Precacher, _PrecachePostsHook> {
     }
   }
 
-  Iterable<Post> _postsInRange(int curr, int range) {
-    final prev = hook.posts.whereIndexed((index, element) {
-      return index < curr && index >= curr - range;
-    });
-
-    final next = hook.posts.whereIndexed((index, element) {
-      return index > curr && index <= curr + range;
-    });
-
-    return {...prev, ...next};
+  Iterable<Post> _postsInRange(int curr, int range) sync* {
+    for (var i = curr - range; i <= curr + range; i++) {
+      if (i == curr) continue;
+      if (i >= 0 && i < hook.posts.length) {
+        yield hook.posts[i];
+      }
+    }
   }
 
   void _precachePosts(i, showOG) {
