@@ -29,12 +29,12 @@ class PostViewer extends HookConsumerWidget {
   });
 
   final int initial;
-  final List<Post> posts;
+  final Iterable<Post> posts;
 
   static void open(
     BuildContext context, {
     required int index,
-    required List<Post> posts,
+    required Iterable<Post> posts,
   }) {
     context.navigator.push(
       SlidePageRoute(
@@ -57,16 +57,17 @@ class PostViewer extends HookConsumerWidget {
     final currentPage = useState(initial);
     final pageController =
         useExtendedPageController(initialPage: currentPage.value);
+    final postList = useState(posts.toList());
     final fullscreen = ref.watch(fullscreenStateProvider);
 
     final post =
-        posts.isEmpty ? Post.empty : posts.elementAt(currentPage.value);
+        postList.value.isEmpty ? Post.empty : postList.value[currentPage.value];
     final showAppbar = useState(true);
     final isLoadingMore = useState(false);
     final loadMore = timelineController.onLoadMore;
     final loadOriginal =
         ref.watch(contentSettingStateProvider.select((it) => it.loadOriginal));
-    final precachePosts = usePrecachePosts(ref, posts);
+    final precachePosts = usePrecachePosts(ref, postList.value);
 
     useEffect(() {
       showAppbar.value = !fullscreen;
@@ -104,22 +105,21 @@ class PostViewer extends HookConsumerWidget {
 
                   final offset = index + 1;
                   final threshold =
-                      posts.length / 100 * (100 - loadMoreThreshold);
-                  if (offset + threshold > posts.length - 1) {
+                      postList.value.length / 100 * (100 - loadMoreThreshold);
+                  if (offset + threshold > postList.value.length - 1) {
                     isLoadingMore.value = true;
                     await loadMore();
-                    await Future.delayed(kThemeAnimationDuration, () {
-                      if (context.mounted) {
-                        isLoadingMore.value = false;
-                      }
-                    });
+                    if (context.mounted) {
+                      postList.value = posts.toList();
+                      isLoadingMore.value = false;
+                    }
                   }
                 },
-                itemCount: posts.length,
+                itemCount: postList.value.length,
                 itemBuilder: (context, index) {
                   precachePosts(index, loadOriginal);
 
-                  final post = posts.elementAt(index);
+                  final post = postList.value[index];
                   final Widget widget;
                   switch (post.content.type) {
                     case PostType.photo:
@@ -154,7 +154,7 @@ class PostViewer extends HookConsumerWidget {
                     subtitle: post.describeTags,
                     title: isLoadingMore.value
                         ? '#${currentPage.value + 1} of (loading...)'
-                        : '#${currentPage.value + 1} of ${posts.length}',
+                        : '#${currentPage.value + 1} of ${postList.value.length}',
                   ),
                 ),
               ),

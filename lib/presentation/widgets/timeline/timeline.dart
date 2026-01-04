@@ -21,7 +21,7 @@ import 'package:tinycolor2/tinycolor2.dart';
 class Timeline extends ConsumerWidget {
   const Timeline({super.key, required this.posts});
 
-  final List<Post> posts;
+  final Iterable<Post> posts;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,17 +32,18 @@ class Timeline extends ConsumerWidget {
         .watch(timelineControllerProvider.select((it) => it.scrollController));
     final blurExplicit =
         ref.watch(contentSettingStateProvider.select((it) => it.blurExplicit));
+    final postList = posts.toList();
 
     return SliverMasonryGrid.count(
       crossAxisCount: flexibleGrid,
       key: ObjectKey(flexibleGrid),
       mainAxisSpacing: 8,
       crossAxisSpacing: 8,
-      childCount: posts.length,
+      childCount: postList.length,
       itemBuilder: (context, index) {
         return _ThumbnailCard(
           gridSize: flexibleGrid,
-          postdata: (index, posts.elementAt(index)),
+          postdata: (index, postList[index]),
           controller: scrollController,
           blurExplicit: blurExplicit,
           onTap: () {
