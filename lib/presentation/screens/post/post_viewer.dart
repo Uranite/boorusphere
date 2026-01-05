@@ -57,7 +57,7 @@ class PostViewer extends HookConsumerWidget {
     final currentPage = useState(initial);
     final pageController =
         useExtendedPageController(initialPage: currentPage.value);
-    final postList = useState(posts.toList());
+    final postList = useState(useMemoized(posts.toList));
     final fullscreen = ref.watch(fullscreenStateProvider);
 
     final post =
